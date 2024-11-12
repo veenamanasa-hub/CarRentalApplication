@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Rentals - Available Cars</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .book-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .book-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styles for the popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .confirm {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .cancel {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        let selectedCarName = '';
+
+        function openDatePopup(carName) {
+            // Store the selected car name
+            selectedCarName = carName;
+            localStorage.setItem('carName', carName);
+
+            // Clear previous dates
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+
+            // Set minimum dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').setAttribute('min', today);
+            document.getElementById('endDate').setAttribute('min', today);
+
+            // Show the popup
+            document.getElementById('datePopup').style.display = 'block';
+        }
+
+        function confirmBooking() {
+            const userName = localStorage.getItem('userName');
+            const carName = selectedCarName;
+            const fromDate = document.getElementById('startDate').value;
+            const toDate = document.getElementById('endDate').value;
+            // Check if all data is available
+    if (!userName || !carName || !fromDate || !toDate) {
+        alert("Please fill in all details.");
+        return;
+    }
+
+    // Create the booking data object
+    const bookingData = {
+        userName: userName,
+        carName: carName,
+        fromDate: fromDate,
+        toDate: toDate
+    };
+
+    //call bookings API
+    fetch('http://localhost:8080/carRentals/bookCar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to book the car');
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert("Booking successful!");
+        closeDatePopup(); // Close the popup on success
+    })
+    .catch(error => {
+        console.error('Error during booking:', error);
+        alert("An error occurred while booking the car. Please try again.");
+    });
+}
+
+        //document.getElementById('confirmationPopup').style.display = 'block';
+
+
+        function closeConfirmationPopup() {
+        closeDatePopup();
+            document.getElementById('confirmationPopup').style.display = 'none';
+        }
+        function closeDatePopup() {
+            document.getElementById('datePopup').style.display = 'none';
+        }
+
+        function updateEndDate() {
+            const startDate = document.getElementById('startDate').value;
+            if (startDate) {
+                // Set the end date to be at least one day after the start date
+                const startDateObj = new Date(startDate);
+                startDateObj.setDate(startDateObj.getDate() + 1);
+                const minEndDate = startDateObj.toISOString().split('T')[0];
+                document.getElementById('endDate').setAttribute('min', minEndDate);
+                document.getElementById('endDate').value = ''; // Reset the end date
+            }
+        }
+
+        function loadCars() {
+            fetch('/carRentals/getCars')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(cars => {
+                    const tableBody = document.getElementById("carsTableBody");
+                    tableBody.innerHTML = ""; // Clear existing rows
+
+                    cars.forEach((car) => {
+                        const row = document.createElement("tr");
+
+                        const nameCell = document.createElement("td");
+                        nameCell.textContent = car.carName;
+                        row.appendChild(nameCell);
+
+                        const countCell = document.createElement("td");
+                        countCell.textContent = car.count;
+                        row.appendChild(countCell);
+
+                        const actionCell = document.createElement("td");
+                        const bookButton = document.createElement("button");
+                        bookButton.textContent = "Book";
+                        bookButton.classList.add("book-button");
+                        bookButton.onclick = function() {
+                            openDatePopup(car.carName);
+                        };
+                        actionCell.appendChild(bookButton);
+                        row.appendChild(actionCell);
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        // Load cars when the page loads
+        window.onload = loadCars;
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>Available Cars</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Car Name</th>
+            <th>Available Count</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="carsTableBody">
+        <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Popup for selecting dates -->
+<div class="popup" id="datePopup">
+    <div class="popup-header">Select Booking Dates</div>
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" onchange="updateEndDate()"><br><br>
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate"><br><br>
+    <div class="button-container">
+        <button class="confirm" onclick="confirmBooking()">Confirm Booking</button>
+        <button class="cancel" onclick="closeConfirmationPopup()">Cancel</button>
+    </div>
+    <div class="popup" id="confirmationPopup">
+        <div class="popup-header">Booking Confirmed!</div>
+        <div class="button-container">
+            <button class="cancel" onclick="closeConfirmationPopup()">Close</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

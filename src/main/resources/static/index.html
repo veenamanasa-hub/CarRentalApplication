@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <style>
+    /* Basic styling for the page layout and form elements */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      width: 300px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+<!-- Container for the login form -->
+<div class="login-container">
+    <h2>Login</h2>
+    <input type="text" id="userName" placeholder="Username" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="verifyLogin()">Login</button>
+    <p id="error-message" class="error"></p>
+</div>
+
+<script>
+    // Function to handle login verification and server request
+    async function verifyLogin() {
+      console.log("verify login");
+      const userName = document.getElementById('userName').value;
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('error-message');
+
+      // Clear previous error message
+      errorMessage.textContent = '';
+
+      // Encode credentials in Base64 for Basic Authentication
+      const base64Credentials = btoa(`${userName}:${password}`);
+
+      try {
+        // Send a POST request to the server with the user's credentials
+        const response = await fetch('http://localhost:8080/carRentals/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${base64Credentials}`
+          },
+          body: JSON.stringify({ userName, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('userName', userName); // Store username in localStorage
+          window.location.href = 'home.html'; // Redirect to home page on success
+        } else {
+          console.log("Response status:", response.status);
+          errorMessage.textContent = 'Login failed'; // Show error message
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorMessage.textContent = 'An error occurred. Please try again.'; // Show error message on exception
+      }
+    }
+  </script>
+</body>
+</html>
