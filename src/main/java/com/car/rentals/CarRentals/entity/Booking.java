@@ -5,8 +5,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Data
@@ -16,8 +14,6 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookingId;
-    private LocalDate fromDate;
-    private LocalDate toDate;
     private Long price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -17,6 +17,11 @@ public class BookingController {
     @Autowired
     BookingService bookingService;
 
+    /**
+     * Book car based on details provided in BookingDto
+     * @param bookingDto
+     * @return Map<String,String>
+     */
     @PostMapping("/bookCar")
     public ResponseEntity<Map<String,String>> bookCar(@RequestBody BookingDto bookingDto) {
         boolean success = bookingService.bookCar(bookingDto);

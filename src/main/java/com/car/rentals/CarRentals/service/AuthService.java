@@ -18,7 +18,11 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder; // For hashing passwords
 
-    // Method to register a new user
+    /**
+     * This method is used to register new user
+     * @param user
+     * @return String
+     */
     public String registerUser(User user) {
         // Check if the username already exists
         Optional<User> existingUser = userRepository.findByUserName(user.getUserName());
@@ -36,7 +40,6 @@ public class AuthService {
     public boolean verifyUser(String userName, String password) {
         User user = userRepository.findByUserName(userName).get();
         if (user != null && BCrypt.checkpw(password,user.getPassword())) {
-            System.out.println("Hashed password" +passwordEncoder.encode(user.getPassword()));
             return true;
         }
         return false;

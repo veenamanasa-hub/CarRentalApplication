@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static com.car.rentals.CarRentals.entity.User.*;
 import static org.springframework.security.core.userdetails.User.builder;
 
 @Service

@@ -2,8 +2,6 @@ package com.car.rentals.CarRentals.entity;
 
 import com.car.rentals.CarRentals.dto.CarDto;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.persistence.*;
 
 @Entity
@@ -17,7 +15,6 @@ public class Car {
     private String carName;
     private int count;
     private String description;
-
     private long price;
 
     public CarDto getCarDto(){

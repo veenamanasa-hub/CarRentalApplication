@@ -2,8 +2,6 @@ package com.car.rentals.CarRentals.dto;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-
 @Data
 public class UserDto {
 

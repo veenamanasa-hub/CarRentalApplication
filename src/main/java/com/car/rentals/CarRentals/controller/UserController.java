@@ -18,13 +18,22 @@ public class UserController {
     @Autowired
     AuthService userDetailsService;
 
-    // Endpoint to register a new user
+    /**
+     * Endpoint to register a new user
+     * @param user
+     * @return String
+     */
     @PostMapping("/register")
     public String registerUser(@RequestBody User user) {
 
         return userDetailsService.registerUser(user);
     }
 
+    /**
+     * API to verify user credentials
+     * @param request
+     * @return <Map<String,String>
+     */
     @PostMapping("/login")
     public ResponseEntity <Map<String,String>> login(@RequestBody UserDto request) {
         Map<String,String> response = new HashMap<>();

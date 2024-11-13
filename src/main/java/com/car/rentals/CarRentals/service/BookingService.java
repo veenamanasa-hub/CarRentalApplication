@@ -32,19 +32,16 @@ public class BookingService {
     public boolean bookCar(BookingDto bookingDTO){
         Optional<Car> optionalCar = carRepository.findByCarName(bookingDTO.getCarName());
         Optional<User> optionalUser = userRepository.findByUserName(bookingDTO.getUserName());
-        System.out.println("In booking service");
-        System.out.println("Optional car"+optionalCar.get().getCarName());
-        System.out.println("Optional user"+optionalUser.get().getUserName());
+
         if(optionalCar.isPresent() && optionalUser.isPresent() && optionalCar.get().getCount()>0){
             Car existingCar = optionalCar.get();
             Booking booking = new Booking();
             booking.setUser(optionalUser.get());
             booking.setCar(optionalCar.get());
-            System.out.println("From date"+bookingDTO.getFromDate());
+
             long diffInMilliSec = bookingDTO.getToDate().getTime() - bookingDTO.getFromDate().getTime();
             long days = TimeUnit.MILLISECONDS.toDays(diffInMilliSec);
-            booking.setFromDate(booking.getFromDate());
-            booking.setToDate(booking.getToDate());
+
             booking.setPrice(existingCar.getPrice()*days);
             bookingRepository.save(booking);
             existingCar.setCount(existingCar.getCount()-1);

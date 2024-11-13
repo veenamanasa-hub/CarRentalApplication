@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -34,9 +35,9 @@ public class CarControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user") // Mock user for authentication
+    @WithMockUser(username = "user") // Simulate an authenticated user
     public void testGetAllAvailableCars() throws Exception {
-        // Arrange
+
         CarDto car1 = new CarDto();
         car1.setCarId(1L);
         car1.setCarName("Sedan");
@@ -54,6 +55,7 @@ public class CarControllerTest {
         mockMvc.perform(get("/carRentals/getCars")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{'id':1,'name':'Sedan','count':5}, {'id':2,'name':'SUV','count':3}]"));
+                .andExpect(content().json("[{'carId':1,'carName':'Sedan','count':5}, {'carId':2,'carName':'SUV','count':3}]"));
     }
+
 }

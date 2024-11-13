@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
@@ -27,21 +26,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors().and()// Disable CSRF for simplicity
+                .cors().and()
                 .authorizeRequests()
-                .antMatchers("/carRentals/register","/index.html", "/home.html","/Dashboard.html").permitAll() // Allow registration without authentication
-                .antMatchers("/carRentals/getCars").permitAll() // Allow access to available cars without authentication
-                .antMatchers("/carRentals/login").authenticated() // Require authentication for booking-related endpoints
+                .antMatchers("/carRentals/register","/carRentals/login","/index.html").permitAll() // Allow registration without authentication
+                .antMatchers("/carRentals/bookCars","/carRentals/getCars").authenticated() // Require authentication for booking-related endpoints
                 .anyRequest().authenticated() // All other requests require authentication
                 .and()
-                .httpBasic(); // Use HTTP Basic Authentication
+                .httpBasic();
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:4200"); // Replace with your frontend URL
         configuration.addAllowedMethod("*"); // Allow all HTTP methods
         configuration.addAllowedHeader("*"); // Allow all headers
         configuration.setAllowCredentials(true); // Allow credentials
